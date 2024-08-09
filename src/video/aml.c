@@ -137,25 +137,14 @@ int aml_setup(int videoFormat, int width, int height, int redrawRate, void* cont
     return -2;
   }
 
-  char vfm_map[2048] = {};
-  char* eol;
-  if (read_file("/sys/class/vfm/map", vfm_map, sizeof(vfm_map) - 1) > 0 && (eol = strchr(vfm_map, '\n'))) {
-    *eol = 0;
+  printf("Using display thread for amlvideo pipeline\n");
 
-    // If amlvideo is in the pipeline, we must spawn a display thread
-    printf("VFM map: %s\n", vfm_map);
-    if (strstr(vfm_map, "amlvideo")) {
-      printf("Using display thread for amlvideo pipeline\n");
-
-      videoFd = open("/dev/video10", O_RDONLY | O_NONBLOCK);
-      if (videoFd < 0) {
-        fprintf(stderr, "Failed to open video device: %d\n", errno);
-        return -3;
-      }
-
-      pthread_create(&displayThread, NULL, aml_display_thread, NULL);
-    }
+  videoFd = open("/dev/video10", O_RDONLY | O_NONBLOCK);
+  if (videoFd < 0) {
+    fprintf(stderr, "Failed to open video device: %d\n", errno);
+    return -3;
   }
+  pthread_create(&displayThread, NULL, aml_display_thread, NULL);
 
   ensure_buf_size(&pkt_buf, &pkt_buf_size, INITIAL_DECODER_BUFFER_SIZE);
 
