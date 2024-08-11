@@ -37,15 +37,13 @@ static int alsa_renderer_init(int audioConfiguration, POPUS_MULTISTREAM_CONFIGUR
   unsigned char alsaMapping[AUDIO_CONFIGURATION_MAX_CHANNEL_COUNT];
 
   /* The supplied mapping array has order: FL-FR-C-LFE-RL-RR-SL-SR
-   * ALSA expects the order: FL-FR-RL-RR-C-LFE-SL-SR
+   * CoreELEC expects the order: FL-FR-LFE-C-RL-RR-SL-SR
    * We need copy the mapping locally and swap the channels around.
    */
   memcpy(alsaMapping, opusConfig->mapping, sizeof(alsaMapping));
   if (opusConfig->channelCount >= 6) {
-    alsaMapping[2] = opusConfig->mapping[4];
-    alsaMapping[3] = opusConfig->mapping[5];
-    alsaMapping[4] = opusConfig->mapping[2];
-    alsaMapping[5] = opusConfig->mapping[3];
+    alsaMapping[2] = opusConfig->mapping[3];
+    alsaMapping[3] = opusConfig->mapping[2];
   }
 
   samplesPerFrame = opusConfig->samplesPerFrame;
